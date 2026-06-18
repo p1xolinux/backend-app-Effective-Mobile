@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: em_backend
+    networks:
+      - em_network
+    # наружу не открываем, только для nginx внутри сети
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: em_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - em_network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  em_network:
+    driver: bridge
